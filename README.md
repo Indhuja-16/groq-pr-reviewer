@@ -18,7 +18,7 @@
 Go to [console.groq.com](https://console.groq.com) → create an account → generate an API key (free tier available).
 
 ### 2. Add the secret to your repo
-`Settings → Secrets → Actions → New repository secret`....
+`Settings → Secrets → Actions → New repository secret`
 
 | Secret name | Value |
 |---|---|
