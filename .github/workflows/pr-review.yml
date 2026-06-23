@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Groq PR Review
-        uses: Indhuja-16/groq-pr-reviewer@main   # ← change to your repo
+        uses: ./   # ← change to your repo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
