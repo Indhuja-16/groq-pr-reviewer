@@ -1,0 +1,53 @@
+name: Groq PR Review
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review_comment:
+    types: [created]
+  issue_comment:
+    types: [created]
+
+# Cancel in-progress runs for the same PR (but not for comment replies)
+concurrency:
+  group: >-
+    ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{
+    github.workflow }}-${{ (github.event_name == 'pull_request_review_comment' ||
+    github.event_name == 'issue_comment') && 'comment' || 'pr' }}
+  cancel-in-progress: >-
+    ${{ github.event_name != 'pull_request_review_comment' &&
+        github.event_name != 'issue_comment' }}
+
+jobs:
+  review:
+    # Only run on pull requests (not regular issues) for comment events
+    if: >-
+      github.event_name == 'pull_request' ||
+      github.event_name == 'pull_request_review_comment' ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Groq PR Review
+        uses: Indhuja-16/groq-pr-reviewer@main   # ← change to your repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        with:
+          debug: false
+          bot_name: groq-reviewer
+          groq_model: openai/gpt-oss-120b
+          groq_model_temperature: '0.3'
+          max_files: '0'
+          review_comment_lgtm: false
+          path_filters: |
+            !dist/**
+            !**/*.lock
+            !**/*.snap
+            !**/*.min.js
+            !**/*.min.css
+            !**/*.generated.*

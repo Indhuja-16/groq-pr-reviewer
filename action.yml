@@ -1,0 +1,106 @@
+name: 'Groq PR Reviewer'
+description: 'AI-powered PR reviewer using Groq + openai/gpt-oss-120b. Provides PR summaries, code change explanations, bug detection with fixes, and @mention replies.'
+author: 'groq-pr-reviewer'
+
+branding:
+  icon: 'code'
+  color: 'orange'
+
+inputs:
+  # ── Core settings ──────────────────────────────────────────────────────────
+  debug:
+    description: 'Enable debug logging (shows API messages in CI logs)'
+    required: false
+    default: 'false'
+
+  bot_name:
+    description: 'The bot name developers use to @mention for follow-up questions'
+    required: false
+    default: 'groq-reviewer'
+
+  # ── Model settings ─────────────────────────────────────────────────────────
+  groq_model:
+    description: 'Groq model to use for reviews'
+    required: false
+    default: 'openai/gpt-oss-120b'
+
+  groq_model_temperature:
+    description: 'Temperature for the model (0.0 = deterministic, 1.0 = creative). Lower is better for code review.'
+    required: false
+    default: '0.3'
+
+  groq_retries:
+    description: 'Number of retries on API failure'
+    required: false
+    default: '3'
+
+  groq_timeout_ms:
+    description: 'Timeout for each API call in milliseconds'
+    required: false
+    default: '120000'
+
+  groq_concurrency_limit:
+    description: 'Max concurrent API calls (reserved for future use)'
+    required: false
+    default: '4'
+
+  # ── Review behaviour ───────────────────────────────────────────────────────
+  max_files:
+    description: 'Maximum number of files to review. 0 = no limit.'
+    required: false
+    default: '0'
+
+  review_comment_lgtm:
+    description: 'Post a comment even when the code looks good (LGTM)'
+    required: false
+    default: 'false'
+
+  path_filters:
+    description: |
+      Newline-separated glob patterns to filter which files are reviewed.
+      Prefix with ! to exclude. Examples:
+        src/**/*.ts
+        !**/*.test.ts
+        !dist/**
+    required: false
+    default: |
+      !dist/**
+      !**/*.lock
+      !**/*.snap
+      !**/*.min.js
+      !**/*.min.css
+
+  system_message:
+    description: 'Override the default system prompt sent to the model'
+    required: false
+    default: ''
+
+  # ── Prompt overrides (advanced) ────────────────────────────────────────────
+  summarize_beginning:
+    description: 'Override the prompt that sets up the PR context at the start of the review conversation'
+    required: false
+    default: ''
+
+  summarize_file_diff:
+    description: 'Override the prompt template used for each file diff. Variables: $filename, $file_type, $file_diff'
+    required: false
+    default: ''
+
+  summarize_final:
+    description: 'Override the prompt that requests the final consolidated review'
+    required: false
+    default: ''
+
+  summarize_release_notes:
+    description: 'Override the prompt for generating release notes'
+    required: false
+    default: ''
+
+  comment_reply:
+    description: 'Override the prompt used when replying to @bot mentions. Variables: $title, $filename, $file_diff, $comment'
+    required: false
+    default: ''
+
+runs:
+  using: 'node20'
+  main: 'dist/bundle/index.js'
